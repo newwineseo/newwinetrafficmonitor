@@ -24,3 +24,14 @@ export function dateRange(start: string, end: string): string[] {
   for (let d = start; d <= end; d = addDays(d, 1)) out.push(d);
   return out;
 }
+
+// Intl lists some zones under old names; show the current ones (GA4 uses these) and include UTC.
+const RENAMED: Record<string, string> = {
+  "Asia/Calcutta": "Asia/Kolkata", "Asia/Saigon": "Asia/Ho_Chi_Minh", "Asia/Katmandu": "Asia/Kathmandu",
+  "Asia/Rangoon": "Asia/Yangon", "Europe/Kiev": "Europe/Kyiv", "America/Buenos_Aires": "America/Argentina/Buenos_Aires",
+};
+
+export function timezoneList(): string[] {
+  const zones = Intl.supportedValuesOf("timeZone").map((z) => RENAMED[z] ?? z);
+  return [...new Set([...zones, "UTC"])].sort();
+}
