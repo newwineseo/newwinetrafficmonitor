@@ -1,9 +1,9 @@
 import "./env";
-import { neon, neonConfig } from "@neondatabase/serverless";
+import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { migrate } from "drizzle-orm/neon-http/migrator";
 
-neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
+import "@/db"; // same Neon settings (endpoint + retry) as the app
 
 async function main() {
   const db = drizzle(neon(process.env.DATABASE_URL!));

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { settings } from "@/db/schema";
 import { DEFAULT_MIN_BASELINE, DEFAULT_THRESHOLD } from "./detect";
@@ -32,6 +33,24 @@ export async function getSettings(): Promise<AppSettings> {
   const out = defaults() as unknown as Record<string, unknown>;
   for (const r of rows) if (r.key in out) out[r.key] = r.value;
   return out as unknown as AppSettings;
+}
+
+export interface EmailError { message: string; at: string }
+
+/** Last email failure (shown as a red banner in Settings), or null once sending works again. */
+export async function getEmailError(): Promise<EmailError | null> {
+  const [row] = await db().select().from(settings).where(eq(settings.key, "email_error"));
+  return (row?.value as EmailError | null) ?? null;
+}
+
+export async function recordEmailResult(error: string | null) {
+  if (!error) {
+    await db().delete(settings).where(eq(settings.key, "email_error"));
+    return;
+  }
+  const value = { message: error, at: new Date().toISOString() };
+  await db().insert(settings).values({ key: "email_error", value })
+    .onConflictDoUpdate({ target: settings.key, set: { value } });
 }
 
 export async function saveSettings(values: Partial<AppSettings>) {

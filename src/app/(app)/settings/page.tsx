@@ -1,22 +1,28 @@
 import { desc } from "drizzle-orm";
 import { db } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
-import { btn, Card, PageTitle } from "@/components/ui";
+import { Banner, btn, Card, PageTitle } from "@/components/ui";
 import { fmtDateTime } from "@/lib/format";
-import { getSettings } from "@/lib/settings";
+import { getEmailError, getSettings } from "@/lib/settings";
+import { DeviceSettings } from "./DeviceSettings";
 import { removeDevice } from "../actions";
 import { SettingsForm } from "./SettingsForm";
 
 export default async function SettingsPage() {
-  const [settings, devices] = await Promise.all([
+  const [settings, devices, emailError] = await Promise.all([
     getSettings(),
     db().select().from(pushSubscriptions).orderBy(desc(pushSubscriptions.createdAt)),
+    getEmailError(),
   ]);
 
   return (
     <div className="max-w-3xl space-y-5">
+      {emailError && (
+        <Banner>Email sending failed: check GMAIL_APP_PASSWORD. Last error {fmtDateTime(new Date(emailError.at))}: {emailError.message}</Banner>
+      )}
       <PageTitle>Settings</PageTitle>
       <SettingsForm settings={settings} />
+      <DeviceSettings />
 
       <Card>
         <h2 className="mb-3 font-semibold text-brand">Devices receiving push notifications</h2>

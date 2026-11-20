@@ -17,5 +17,5 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   // Skip Next internals and public static files (service worker, manifest, icons, sound).
-  matcher: ["/((?!_next/|favicon.ico|sw.js|manifest.webmanifest|icons/|alert.mp3).*)"],
+  matcher: ["/((?!_next/|favicon.ico|icon.png|sw.js|manifest.webmanifest|icons/|alert.mp3).*)"],
 };
