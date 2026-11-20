@@ -27,15 +27,16 @@ export async function notifyRun(alerts: AlertForNotify[], problems: DataProblem[
   else {
     const sitesInvolved = [...alerts.map((a) => a.site), ...problems.map((p) => p.site)];
     const recipients = [...new Set([...cfg.recipients, ...sitesInvolved.flatMap((s) => s.extraRecipients)].map((e) => e.toLowerCase()))];
+    const cc = [...new Set(cfg.cc_recipients.map((e) => e.toLowerCase()))].filter((e) => !recipients.includes(e));
     if (!recipients.length) log("No email recipients set; add them in Settings");
     else {
       try {
         const email = buildDigestEmail(digestAlerts, digestProblems, appUrl());
-        const r = await sendEmail({ to: recipients, ...email });
+        const r = await sendEmail({ to: recipients, cc, ...email });
         if (r.status === "sent") {
           out.emailsSent = 1;
           if (ids.length) await db().update(alertsTable).set({ emailedAt: new Date() }).where(inArray(alertsTable.id, ids));
-          log(`Email sent to ${recipients.length} recipient(s): ${email.subject}`);
+          log(`Email sent to ${recipients.length} recipient(s)${cc.length ? ` and ${cc.length} CC` : ""}: ${email.subject}`);
         } else {
           log(`Email logged to the console (no email credentials set): ${email.subject}`);
         }

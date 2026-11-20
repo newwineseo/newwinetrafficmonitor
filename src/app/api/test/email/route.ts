@@ -17,12 +17,13 @@ export async function POST() {
   ], [{ siteName: "Another Site", domain: "another.example", error: "Sample data connection problem" }], appUrl());
 
   try {
-    const r = await sendEmail({ to: cfg.recipients, ...sample, subject: `Test email: ${sample.subject}` });
+    const cc = cfg.cc_recipients.filter((e) => !cfg.recipients.includes(e));
+    const r = await sendEmail({ to: cfg.recipients, cc, ...sample, subject: `Test email: ${sample.subject}` });
     await recordEmailResult(null);
     return NextResponse.json({
       ok: true,
       message: r.status === "sent"
-        ? `Test email sent to ${cfg.recipients.join(", ")}.`
+        ? `Test email sent to ${cfg.recipients.join(", ")}${cc.length ? `, CC ${cc.join(", ")}` : ""}.`
         : "GMAIL_APP_PASSWORD is empty, so the email was printed to the server console instead of sent.",
     });
   } catch (e) {

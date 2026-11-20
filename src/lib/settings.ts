@@ -7,6 +7,8 @@ export interface AppSettings {
   default_threshold: number;
   min_baseline: number;
   recipients: string[];
+  /** Copied (CC) on every alert email. */
+  cc_recipients: string[];
   email_enabled: boolean;
   push_enabled: boolean;
   ga4_lag_days: number;
@@ -21,6 +23,7 @@ function defaults(): AppSettings {
     default_threshold: DEFAULT_THRESHOLD,
     min_baseline: DEFAULT_MIN_BASELINE,
     recipients: parseEmailList(process.env.ALERT_RECIPIENTS),
+    cc_recipients: [],
     email_enabled: true,
     push_enabled: true,
     ga4_lag_days: 1,

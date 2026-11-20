@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 
 export interface EmailMessage {
   to: string[];
+  cc?: string[];
   bcc?: string[];
   subject: string;
   text: string;
@@ -23,7 +24,7 @@ function fromHeader() {
 
 function logToConsole(msg: EmailMessage, why: string): EmailResult {
   console.log(`[email] ${why}; logging instead of sending.\nTo: ${msg.to.join(", ")}\n` +
-    `${msg.bcc?.length ? `Bcc: ${msg.bcc.join(", ")}\n` : ""}Subject: ${msg.subject}\n\n${msg.text}\n[email] end`);
+    `${msg.cc?.length ? `Cc: ${msg.cc.join(", ")}\n` : ""}${msg.bcc?.length ? `Bcc: ${msg.bcc.join(", ")}\n` : ""}Subject: ${msg.subject}\n\n${msg.text}\n[email] end`);
   return { status: "logged" };
 }
 
@@ -35,7 +36,7 @@ async function sendViaGmail(msg: EmailMessage): Promise<EmailResult> {
     host: "smtp.gmail.com", port: 465, secure: true, auth: { user, pass },
   });
   // Gmail rewrites any other From address, so always send as the authenticated account.
-  const info = await transport.sendMail({ from: header, to: msg.to, bcc: msg.bcc, subject: msg.subject, text: msg.text, html: msg.html });
+  const info = await transport.sendMail({ from: header, to: msg.to, cc: msg.cc, bcc: msg.bcc, subject: msg.subject, text: msg.text, html: msg.html });
   return { status: "sent", id: info.messageId };
 }
 
@@ -45,7 +46,7 @@ async function sendViaResend(msg: EmailMessage): Promise<EmailResult> {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: fromHeader().header, to: msg.to, bcc: msg.bcc, subject: msg.subject, text: msg.text, html: msg.html }),
+    body: JSON.stringify({ from: fromHeader().header, to: msg.to, cc: msg.cc, bcc: msg.bcc, subject: msg.subject, text: msg.text, html: msg.html }),
   });
   if (!res.ok) throw new Error(`Resend error ${res.status}: ${await res.text()}`);
   return { status: "sent", id: (await res.json()).id };

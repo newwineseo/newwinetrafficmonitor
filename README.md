@@ -73,7 +73,7 @@ Set these in `.env.local` locally, and in Vercel under Project > Settings > Envi
 | `GMAIL_APP_PASSWORD` | Yes | 16-character Google App Password, no spaces. If empty, emails are printed to the server log instead of sent. |
 | `EMAIL_FROM_NAME` | No | Sender name, default `NewWine Traffic Monitor` |
 | `RESEND_API_KEY` | Only for Resend | Used when `EMAIL_PROVIDER=resend` |
-| `ALERT_RECIPIENTS` | Yes | Comma-separated team emails. Used until recipients are saved in Settings; after that, Settings wins. |
+| `ALERT_RECIPIENTS` | Yes | Comma-separated team emails. Used until recipients are saved in Settings; after that, Settings wins. CC recipients are set in Settings only. |
 | `ADMIN_PASSWORD` | Yes | The shared login password |
 | `SESSION_SECRET` | Yes | Random string for signing the login cookie. Generate it with `openssl rand -hex 32`. |
 | `CRON_SECRET` | Yes | Random string. Vercel sends it to the cron route as `Authorization: Bearer <CRON_SECRET>`. |

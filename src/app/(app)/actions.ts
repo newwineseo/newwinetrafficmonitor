@@ -130,7 +130,9 @@ export async function updateSettings(_: FormState, fd: FormData): Promise<FormSt
   const minBaseline = Number(fd.get("min_baseline"));
   const rawRecipients = String(fd.get("recipients") ?? "");
   const recipients = parseEmailList(rawRecipients);
-  const bad = rawRecipients.split(/[,;\s]+/).filter((x) => x && !x.includes("@"));
+  const rawCc = String(fd.get("cc_recipients") ?? "");
+  const ccRecipients = parseEmailList(rawCc);
+  const bad = `${rawRecipients} ${rawCc}`.split(/[,;\s]+/).filter((x) => x && !x.includes("@"));
 
   if (!(threshold >= 1 && threshold <= 95)) return { error: "Default threshold must be between 1 and 95." };
   if (!(minBaseline >= 0)) return { error: "Minimum average must be 0 or more." };
@@ -140,6 +142,7 @@ export async function updateSettings(_: FormState, fd: FormData): Promise<FormSt
     default_threshold: threshold,
     min_baseline: minBaseline,
     recipients,
+    cc_recipients: ccRecipients,
     email_enabled: fd.get("email_enabled") === "on",
     push_enabled: fd.get("push_enabled") === "on",
   });

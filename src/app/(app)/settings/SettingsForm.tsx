@@ -35,6 +35,12 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
             placeholder="name@example.com, other@example.com" />
           <p className="mt-1 text-xs text-gray-500">Comma-separated. All recipients get one combined email per check.</p>
         </div>
+        <div>
+          <label htmlFor="cc_recipients" className="mb-1 block text-sm font-medium">CC recipients</label>
+          <textarea id="cc_recipients" name="cc_recipients" rows={2} defaultValue={settings.cc_recipients.join(", ")} className={input}
+            placeholder="name@example.com, other@example.com" />
+          <p className="mt-1 text-xs text-gray-500">Comma-separated. Copied (CC) on every alert email and test email.</p>
+        </div>
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="email_enabled" defaultChecked={settings.email_enabled} className="h-4 w-4" />
